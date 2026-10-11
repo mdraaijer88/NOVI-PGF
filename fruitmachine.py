@@ -74,3 +74,4 @@ def fruitmachine_spel(total_budget):
 
     return total_budget, actie
 #TODO keuze draaien nog veranderen.
+#TODO keuze 3 is naar menu van Fruitmachine maar moet terug naar hoofdmenu

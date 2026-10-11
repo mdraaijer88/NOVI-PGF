@@ -1,27 +1,34 @@
+from rich.console import Console
+from rich.table import Table
 from datetime import date
+console = Console()
 
 from blackjack import blackjack_spel
 from roulette import roulette_spel
 from fruitmachine import fruitmachine_spel
-#from blackjack import blackjack_spel()
+from account import start_account_menu
 
 REGIS_FEE = 25.00
 GAMB_TAX = 18.50
 TICKET = 2.50
 
+
 def welkomst_bericht():
-    print("Welkom bij Casino")
-    print("1.Profiel aanmaken")
-    print("2. Afsluiten")
+    table = Table(title="Welkom bij Casino")
+    table.add_column("Keuze", justify="center")
+    table.add_column("Actie")
+    table.add_row("1", "Starten")
+    table.add_row("2", "Afsluiten")
+    console.print(table)
 
     keuze = input("Maak je keuze: ")
-    if keuze in ("1", "2", "3"):
+    if keuze in ("1", "2"):
         return keuze
-    print("Maak een juiste keuze")
+    console.print("Maak een juiste keuze!")
     return None
 
-welkomst_bericht()
 
+welkomst_bericht()
 def user_input():
     first_name = input("Wat is uw voornaam? ")
     sur_name = input("Wat is uw achternaam? ")
@@ -51,24 +58,29 @@ def define_start_budget():
     return start_budget, total_budget
 
 def show_welcome_message(start_budget, total_budget, salutation):
-    print("Casino de Gouden Driehoek")
-    print("-----------------------------")
-    print(f"Beste {salutation},\n")
-    print(f"Start budget     €{start_budget:.2f}")
-    print(f"Inschrijfkosten -€{REGIS_FEE:.2f}")
-    print(f"Gok belasting   -€{GAMB_TAX:.2f}")
-    print(f"Dagticket       -€{TICKET:.2f}\n")
-    print(f"Totaal saldo     €{total_budget:.2f}")
-    print("-----------------------------")
+    table = Table(title="Casino de Gouden Driehoek")
+    table.add_column("Omschrijving")
+    table.add_column("Bedrag", justify="right")
+    table.add_row(f"Beste {salutation}", "")
+    table.add_row("Startbudget", f"€ {start_budget:.2f}")
+    table.add_row("Inschrijfkosten", f"- € {REGIS_FEE:.2f}")
+    table.add_row("Gokbelasting", f"- € {GAMB_TAX:.2f}")
+    table.add_row("Dagticket", f"- € {TICKET:.2f}")
+    table.add_section()
+    table.add_row("Totaal saldo", f"€ {total_budget:.2f}")
     if total_budget <= 0:
-        print("Uw speelsaldo is onvoldoende")
+        table.add_row("Status", "[bold red]Speelsaldo onvoldoende[/bold red]")
     else:
-        print("Uw speelsaldo is voldoende")
+        table.add_row("Status", "[bold green]Speelsaldo voldoende[/bold green]")
+    console.print(table)
 
 def hoofdmenu():
-    print("1. Spellen")
-    print("2. Saldo")
-    print("3. Account")
+    table = Table()
+    table.add_column("Hoofdmenu ")
+    table.add_row("1. Spellen")
+    table.add_row("2. Saldo")
+    table.add_row("3. Account")
+    console.print(table)
 
     keuze = input("Maak je keuze: ")
     if keuze in ("1", "2", "3"):
@@ -78,11 +90,13 @@ def hoofdmenu():
 
 
 def show_games_menu():
-    print("\nKies een spel:")
-    print("1. Roulette")
-    print("2. Fruitmachine")
-    print("3. Blackjack")
-    print("0. Stoppen")
+    table = Table()
+    table.add_column("Kies een spel:")
+    table.add_row("1. Roulette")
+    table.add_row("2. Fruitmachine")
+    table.add_row("3. Blackjack")
+    table.add_row("0. Stoppen")
+    console.print(table)
 
     while True:
         choice = input("Kies een spel: ")
@@ -93,8 +107,6 @@ def show_games_menu():
 def toon_saldo(total_budget):
     print(f"Uw saldo is €{total_budget:.2f}")
 
-def toon_account(salutation):
-    print(f"Account: {salutation}")
 
 def main():
     first_name, sur_name, birthdate, gender = user_input()
@@ -108,6 +120,14 @@ def main():
 
     start_budget, total_budget = define_start_budget()
     show_welcome_message(start_budget, total_budget, salutation)
+
+    account = {
+        "voornaam": first_name,
+        "achternaam": sur_name,
+        "aanspreekvorm": salutation,
+        "geboortedatum": birthdate,
+        "saldo": total_budget,
+    }
 
     while True:
         keuze = hoofdmenu()
@@ -139,7 +159,8 @@ def main():
             toon_saldo(total_budget)
 
         elif keuze == "3":  # Account
-            toon_account(salutation)
+            account["saldo"] = total_budget
+            start_account_menu(account)
 
         if total_budget <= 0:
             break
